@@ -1,0 +1,169 @@
+# Kconfig settings for Atmel SAM processors
+
+if MACH_ATSAM
+
+config ATSAM_SELECT
+    bool
+    default y
+    select HAVE_GPIO
+    select HAVE_GPIO_ADC
+    select HAVE_GPIO_I2C
+    select HAVE_GPIO_SPI
+    select HAVE_GPIO_HARD_PWM
+    select HAVE_GPIO_BITBANGING
+    select HAVE_STRICT_TIMING
+    select HAVE_CHIPID
+
+config BOARD_DIRECTORY
+    string
+    default "atsam"
+
+choice
+    prompt "Processor model"
+    config MACH_SAM3X8E
+        bool "SAM3x8e (Arduino Due)"
+        select MACH_SAM3X
+    config MACH_SAM3X8C
+        bool "SAM3x8c (Printrboard G2)"
+        select MACH_SAM3X
+    config MACH_SAM4S8C
+        bool "SAM4s8c (Duet Maestro)"
+        select MACH_SAM4S
+    config MACH_SAM4E8E
+        bool "SAM4e8e (Duet Wifi/Eth)"
+        select MACH_SAM4E
+endchoice
+
+config MACH_SAM3X
+    bool
+config MACH_SAM4
+    bool
+config MACH_SAM4S
+    bool
+    select MACH_SAM4
+config MACH_SAM4E
+    bool
+    select MACH_SAM4
+
+config MCU
+    string
+    default "sam3x8e" if MACH_SAM3X8E
+    default "sam3x8c" if MACH_SAM3X8C
+    default "sam4s8c" if MACH_SAM4S8C
+    default "sam4e8e" if MACH_SAM4E8E
+
+config CLOCK_FREQ
+    int
+    default 84000000 if MACH_SAM3X
+    default 120000000 if MACH_SAM4
+
+config FLASH_START
+    hex
+    default 0x400000 if MACH_SAM4
+    default 0x80000
+
+config FLASH_SIZE
+    hex
+    default 0x80000
+
+config RAM_START
+    hex
+    default 0x20000000
+
+config RAM_SIZE
+    hex
+    default 0x18000 if MACH_SAM3X
+    default 0x20000 if MACH_SAM4
+
+config STACK_SIZE
+    int
+    default 512
+
+config USBSERIAL
+    bool
+config SERIAL
+    bool
+choice
+    prompt "Communication interface"
+    config ATSAM_USB
+        bool "USB"
+        select USBSERIAL
+    config ATSAM_SERIAL
+        bool "Serial"
+        select SERIAL
+endchoice
+
+choice
+    prompt "Ghead select interface"
+    config ATSAM_SINGLE_NONE_GHEAD
+	bool "No ghead"
+    config ATSAM_SINGLE_GHEAD_L
+	bool "Single left head"
+	select SERIAL_1
+    config ATSAM_SINGLE_GHEAD_R
+	bool "Single right head"
+	select SERIAL_2
+    config ATSAM_DOUBLE_GHEAD
+	bool "RMF500 Double ghead"
+	select SERIAL_D
+    config ATSAM_PRO3_DOUBLE_GHEAD_PORT_0
+	bool "Pro3 Ghead port 0"
+	select SERIAL_PD_0
+    config ATSAM_PRO3_DOUBLE_GHEAD_PORT_1
+	bool "Pro3 Ghead port 1"
+	select SERIAL_PD_1
+    
+    choice 
+        prompt "Ghead baudrate select"
+        config GHEAD_BUAD_9600
+	    bool "9600"
+	    select GH_B9600
+	config GHEAD_BUAD_19200
+            bool "19200"
+            select GH_B19200
+	config GHEAD_BUAD_38400
+            bool "38400"
+            select GH_B38400
+	config GHEAD_BUAD_57600
+            bool "57600"
+            select GH_B57600
+	config GHEAD_BUAD_115200
+            bool "115200"
+            select GH_B115200
+	config GHEAD_BUAD_230400
+            bool "230400"
+            select GH_B230400
+    endchoice
+
+    config GH_BUAD_RATE
+        int
+        default 9600    if GHEAD_BUAD_9600
+        default 19200   if GHEAD_BUAD_19200
+        default 38400   if GHEAD_BUAD_38400
+        default 57600   if GHEAD_BUAD_57600
+        default 115200  if GHEAD_BUAD_115200
+        default 230400  if GHEAD_BUAD_230400	
+    choice
+	prompt "Ghead select protocol"
+	config GHEAD_GCODE_PROTOCOL
+	    bool "g code protocol"
+	    select GHEAD_GCODE
+	config GHEAD_OTHER_PROTOCOL
+	    bool "other protocol"
+	    select GHEAD_OP
+    endchoice 
+    choice
+	prompt "Select debug port"
+	config SPORT_B_NONE_DEBUG
+	    bool "no debug msg"
+	    select SPORT_NO_D
+	config SPORT_B_DEBUG_ON_PORT0
+	    bool "debug on port0"
+	    select SPORT_D_0
+	config SPORT_B_DEBUG_ON_PORT1
+	    bool "debug on port1"
+	    select SPORT_D_1
+    endchoice
+endchoice
+
+endif
